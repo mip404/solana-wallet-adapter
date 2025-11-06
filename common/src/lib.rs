@@ -5,3 +5,6 @@
 //!
 mod clusters;
 pub use clusters::*;
+
+mod events;
+pub use events::*;
