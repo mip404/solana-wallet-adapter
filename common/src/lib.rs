@@ -11,3 +11,6 @@ pub use events::*;
 
 mod commitment;
 pub use commitment::*;
+
+mod version;
+pub use version::*;
