@@ -39,18 +39,14 @@ impl StandardFeatures for SolanaStandardEvents {
         "standard:on"
     }
 
-    fn supports_sign_in(&self) -> bool {
-        self.sign_in().is_some()
-    }
-
     /// Identifier for `standard:events`
     fn namespace(&self) -> &str {
         "standard:events"
     }
 
     /// Identifier for `solana:signIn`
-    fn sign_in(&self) -> Option<&str> {
-        Some("solana:signIn")
+    fn sign_in(&self) -> &str {
+        "solana:signIn"
     }
 
     /// Identifier for `solana:signMessage`
