@@ -5,7 +5,7 @@ pub trait Commitment {
 
     fn finalized(&self) -> Self;
 
-    fn into(&self, commitment_str: &str) -> Self;
+    fn into(commitment_str: &str) -> Self;
 
     /// Get the commitment as a [str] format
     fn as_str(&self) -> &str;

@@ -34,11 +34,7 @@ pub trait StandardFeatures {
         "standard:on"
     }
 
-    fn sign_in(&self) -> Option<&str>;
-
-    fn supports_sign_in(&self) -> bool {
-        self.sign_in().is_some()
-    }
+    fn sign_in(&self) -> &str;
 
     fn sign_message(&self) -> &str;
 
