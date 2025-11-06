@@ -8,3 +8,6 @@ pub use clusters::*;
 
 mod events;
 pub use events::*;
+
+mod commitment;
+pub use commitment::*;
