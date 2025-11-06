@@ -1,13 +1,13 @@
 use core::{fmt, hash::Hash};
 
 pub trait Cluster: fmt::Debug + PartialEq + Eq + PartialOrd + Ord + Hash + Clone + Copy {
-    fn identifier(&self) -> &str;
+    fn network_namespace(&self) -> &str;
 
     fn chain(&self) -> &str;
-
+    fn identifier(&self) -> &str;
     fn endpoint(&self) -> &str;
 
-    fn chains(&self) -> &'static [&'static str];
+    fn chains(&self) -> [&str; 4];
 }
 
 pub trait ClusterEnabled {
