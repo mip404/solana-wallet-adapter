@@ -5,7 +5,7 @@ use std::borrow::Cow;
 pub const WALLET_STANDARD_VERSION: &str = "1.0.0";
 
 /// Semver Versioning struct
-#[derive(Default, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy)]
 pub struct SemverVersion {
     major: u8,
     minor: u8,
@@ -87,5 +87,18 @@ pub trait Version {
             minor: 0,
             patch: 0,
         }
+    }
+}
+
+impl Version for SemverVersion {}
+
+impl Default for SemverVersion {
+    fn default() -> Self {
+        Self {
+            major: 0,
+            minor: 0,
+            patch: 0,
+        }
+        .version()
     }
 }
