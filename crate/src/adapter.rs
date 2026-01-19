@@ -359,7 +359,7 @@ impl WalletAdapter {
             .await
     }
 
-    /// Send a connect request to the browser wallet
+    /// Send a sign transaction request to the browser wallet
     pub async fn sign_transaction(
         &self,
         transaction_bytes: &[u8],
@@ -372,6 +372,25 @@ impl WalletAdapter {
             .connected_wallet()?
             .sign_transaction(
                 transaction_bytes,
+                cluster,
+                self.connection_info().await.connected_account()?,
+            )
+            .await
+    }
+
+    /// Sign multiple transactions at once with a single wallet approval.
+    pub async fn sign_all_transactions(
+        &self,
+        transactions: &[impl AsRef<[u8]>],
+        cluster: Option<Cluster>,
+    ) -> WalletResult<Vec<Vec<u8>>> {
+        let connection_info = self.connection_info();
+
+        connection_info
+            .await
+            .connected_wallet()?
+            .sign_all_transactions(
+                transactions,
                 cluster,
                 self.connection_info().await.connected_account()?,
             )
@@ -541,6 +560,15 @@ impl WalletAdapter {
             .await
             .connected_wallet()?
             .solana_sign_transaction())
+    }
+
+    /// Check if the connected wallet supports `solana:signAllTransactions` feature
+    pub async fn solana_sign_all_transactions(&self) -> WalletResult<bool> {
+        Ok(self
+            .connection_info()
+            .await
+            .connected_wallet()?
+            .solana_sign_all_transactions())
     }
 }
 

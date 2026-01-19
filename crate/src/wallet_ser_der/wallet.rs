@@ -87,6 +87,22 @@ impl Wallet {
             .await
     }
 
+    /// Sign multiple transactions at once with a single wallet approval.
+    pub async fn sign_all_transactions(
+        &self,
+        transactions: &[impl AsRef<[u8]>],
+        cluster: Option<Cluster>,
+        account: &WalletAccount,
+    ) -> WalletResult<Vec<Vec<u8>>> {
+        if let Some(sign_all_tx) = self.features.sign_all_tx.as_ref() {
+            sign_all_tx
+                .call_sign_all_tx(account, transactions, cluster)
+                .await
+        } else {
+            Err(WalletError::MissingSignAllTransactionsFunction)
+        }
+    }
+
     /// Get the standard events [Function](web_sys::js_sys::Function) `[standard:events].on`
     pub async fn call_on_event(
         &self,
@@ -237,6 +253,11 @@ impl Wallet {
     /// Check whether the wallet supports `solana:signTransaction` feature
     pub fn solana_sign_transaction(&self) -> bool {
         self.data.solana_sign_transaction()
+    }
+
+    /// Check whether the wallet supports `solana:signAllTransactions` feature
+    pub fn solana_sign_all_transactions(&self) -> bool {
+        self.data.solana_sign_all_transactions()
     }
 
     /// Get the optional wallet icon

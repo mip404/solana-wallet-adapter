@@ -16,4 +16,6 @@ pub struct FeatureSupport {
     pub sign_and_send_tx: bool,
     /// 'solana:signTransaction'
     pub sign_tx: bool,
+    /// 'solana:signAllTransactions'
+    pub sign_all_tx: bool,
 }

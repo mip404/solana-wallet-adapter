@@ -62,6 +62,14 @@ impl SignTransaction {
         Self::new(reflection, version, "signAndSendTransaction")
     }
 
+    /// Parse a `solana:signAllTransactions` callback from the [JsValue]
+    pub(crate) fn new_sign_all_tx(
+        reflection: &Reflection,
+        version: SemverVersion,
+    ) -> WalletResult<Self> {
+        Self::new(reflection, version, "signAllTransactions")
+    }
+
     fn get_tx_version_support(inner_value: &Reflection) -> WalletResult<(bool, bool)> {
         let tx_version_support_jsvalue = inner_value
             .reflect_inner("supportedTransactionVersions")
@@ -113,6 +121,36 @@ impl SignTransaction {
 
         let success = wasm_bindgen_futures::JsFuture::from(outcome).await?;
         Reflection::new(success)?.get_bytes_from_vec("signedTransaction")
+    }
+
+    /// Sign multiple transactions at once with a single wallet approval.
+    /// This is more efficient than signing transactions individually when
+    /// you need to sign multiple transactions.
+    pub(crate) async fn call_sign_all_tx(
+        &self,
+        wallet_account: &WalletAccount,
+        transactions: &[impl AsRef<[u8]>],
+        cluster: Option<Cluster>,
+    ) -> WalletResult<Vec<Vec<u8>>> {
+        let tx_array = js_sys::Array::new();
+        for tx_bytes in transactions {
+            let tx_uint8array: js_sys::Uint8Array = tx_bytes.as_ref().into();
+            tx_array.push(&tx_uint8array);
+        }
+
+        let mut tx_object = Reflection::new_object();
+        tx_object.set_object(&"account".into(), &wallet_account.js_value)?;
+        tx_object.set_object(&"transactions".into(), &tx_array)?;
+        if let Some(cluster) = cluster {
+            tx_object.set_object(&"chain".into(), &cluster.chain().into())?;
+        }
+
+        let outcome = self.callback.call1(&JsValue::null(), &tx_object.take())?;
+
+        let outcome = js_sys::Promise::resolve(&outcome);
+
+        let success = wasm_bindgen_futures::JsFuture::from(outcome).await?;
+        Reflection::new(success)?.get_bytes_from_vec("signedTransactions")
     }
 
     pub(crate) async fn call_sign_and_send_transaction(

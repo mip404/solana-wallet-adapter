@@ -5,9 +5,10 @@ use wallet_adapter_common::{
     clusters::Cluster,
     feature_support::FeatureSupport,
     standardized_events::{
-        SOLANA_SIGN_AND_SEND_TRANSACTION_IDENTIFIER, SOLANA_SIGN_IN_IDENTIFIER,
-        SOLANA_SIGN_MESSAGE_IDENTIFIER, SOLANA_SIGN_TRANSACTION_IDENTIFIER,
-        STANDARD_CONNECT_IDENTIFIER, STANDARD_DISCONNECT_IDENTIFIER, STANDARD_EVENTS_IDENTIFIER,
+        SOLANA_SIGN_ALL_TRANSACTIONS_IDENTIFIER, SOLANA_SIGN_AND_SEND_TRANSACTION_IDENTIFIER,
+        SOLANA_SIGN_IN_IDENTIFIER, SOLANA_SIGN_MESSAGE_IDENTIFIER,
+        SOLANA_SIGN_TRANSACTION_IDENTIFIER, STANDARD_CONNECT_IDENTIFIER,
+        STANDARD_DISCONNECT_IDENTIFIER, STANDARD_EVENTS_IDENTIFIER,
     },
     WalletAccountData, WalletCommonUtils,
 };
@@ -136,6 +137,8 @@ impl WalletAccount {
                 supported_features.sign_tx = true;
             } else if feature.as_str() == SOLANA_SIGN_MESSAGE_IDENTIFIER {
                 supported_features.sign_message = true;
+            } else if feature.as_str() == SOLANA_SIGN_ALL_TRANSACTIONS_IDENTIFIER {
+                supported_features.sign_all_tx = true;
             } else {
                 return Err(WalletError::UnsupportedWalletFeature(feature.to_owned()));
             }
@@ -225,6 +228,11 @@ impl WalletAccount {
     /// Checks if `solana:signTransaction` is supported
     pub fn solana_sign_transaction(&self) -> bool {
         self.account.supported_features.sign_tx
+    }
+
+    /// Checks if `solana:signAllTransactions` is supported
+    pub fn solana_sign_all_transactions(&self) -> bool {
+        self.account.supported_features.sign_all_tx
     }
 }
 
