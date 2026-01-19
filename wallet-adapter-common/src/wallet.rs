@@ -168,11 +168,6 @@ impl WalletData {
         self.supported_features.sign_tx
     }
 
-    /// Check whether the wallet supports `solana:signAllTransactions` feature
-    pub fn solana_sign_all_transactions(&self) -> bool {
-        self.supported_features.sign_all_tx
-    }
-
     /// Get the optional Wallet Icon
     pub fn icon(&self) -> Option<&Cow<'static, str>> {
         self.icon.as_ref()

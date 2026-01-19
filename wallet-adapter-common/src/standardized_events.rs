@@ -17,5 +17,3 @@ pub const SOLANA_SIGN_TRANSACTION_IDENTIFIER: &str = "solana:signTransaction";
 pub const SOLANA_SIGN_IN_IDENTIFIER: &str = "solana:signIn";
 /// Identifier for `solana:signMessage`
 pub const SOLANA_SIGN_MESSAGE_IDENTIFIER: &str = "solana:signMessage";
-/// Identifier for `solana:signAllTransactions`
-pub const SOLANA_SIGN_ALL_TRANSACTIONS_IDENTIFIER: &str = "solana:signAllTransactions";

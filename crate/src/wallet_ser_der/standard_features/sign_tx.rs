@@ -62,14 +62,6 @@ impl SignTransaction {
         Self::new(reflection, version, "signAndSendTransaction")
     }
 
-    /// Parse a `solana:signAllTransactions` callback from the [JsValue]
-    pub(crate) fn new_sign_all_tx(
-        reflection: &Reflection,
-        version: SemverVersion,
-    ) -> WalletResult<Self> {
-        Self::new(reflection, version, "signAllTransactions")
-    }
-
     fn get_tx_version_support(inner_value: &Reflection) -> WalletResult<(bool, bool)> {
         let tx_version_support_jsvalue = inner_value
             .reflect_inner("supportedTransactionVersions")
@@ -100,57 +92,37 @@ impl SignTransaction {
         Ok((legacy, version_zero))
     }
 
-    pub(crate) async fn call_sign_tx(
-        &self,
-        wallet_account: &WalletAccount,
-        transaction_bytes: &[u8],
-        cluster: Option<Cluster>,
-    ) -> WalletResult<Vec<Vec<u8>>> {
-        let tx_bytes_value: js_sys::Uint8Array = transaction_bytes.into();
-
-        let mut tx_object = Reflection::new_object();
-        tx_object.set_object(&"account".into(), &wallet_account.js_value)?;
-        tx_object.set_object(&"transaction".into(), &tx_bytes_value)?;
-        if let Some(cluster) = cluster {
-            tx_object.set_object(&"chain".into(), &cluster.chain().into())?;
-        }
-
-        let outcome = self.callback.call1(&JsValue::null(), &tx_object.take())?;
-
-        let outcome = js_sys::Promise::resolve(&outcome);
-
-        let success = wasm_bindgen_futures::JsFuture::from(outcome).await?;
-        Reflection::new(success)?.get_bytes_from_vec("signedTransaction")
-    }
-
-    /// Sign multiple transactions at once with a single wallet approval.
-    /// This is more efficient than signing transactions individually when
-    /// you need to sign multiple transactions.
-    pub(crate) async fn call_sign_all_tx(
+    pub(crate) async fn call_sign_multiple_tx(
         &self,
         wallet_account: &WalletAccount,
         transactions: &[impl AsRef<[u8]>],
         cluster: Option<Cluster>,
     ) -> WalletResult<Vec<Vec<u8>>> {
-        let tx_array = js_sys::Array::new();
+        let inputs_array = js_sys::Array::new();
         for tx_bytes in transactions {
             let tx_uint8array: js_sys::Uint8Array = tx_bytes.as_ref().into();
-            tx_array.push(&tx_uint8array);
+            let mut tx_object = Reflection::new_object();
+            tx_object.set_object(&"account".into(), &wallet_account.js_value)?;
+            tx_object.set_object(&"transaction".into(), &tx_uint8array)?;
+            if let Some(ref cluster) = cluster {
+                tx_object.set_object(&"chain".into(), &cluster.chain().into())?;
+            }
+            inputs_array.push(&tx_object.take());
         }
 
-        let mut tx_object = Reflection::new_object();
-        tx_object.set_object(&"account".into(), &wallet_account.js_value)?;
-        tx_object.set_object(&"transactions".into(), &tx_array)?;
-        if let Some(cluster) = cluster {
-            tx_object.set_object(&"chain".into(), &cluster.chain().into())?;
-        }
-
-        let outcome = self.callback.call1(&JsValue::null(), &tx_object.take())?;
-
+        let outcome = self.callback.apply(&JsValue::null(), &inputs_array)?;
         let outcome = js_sys::Promise::resolve(&outcome);
-
         let success = wasm_bindgen_futures::JsFuture::from(outcome).await?;
-        Reflection::new(success)?.get_bytes_from_vec("signedTransactions")
+
+        let results_array = Reflection::new(success)?.into_array()?;
+        let mut signed_txs = Vec::with_capacity(results_array.length() as usize);
+        for result in results_array.iter() {
+            let bytes = Reflection::new(result)?.get_bytes_from_vec("signedTransaction")?;
+            if let Some(first) = bytes.into_iter().next() {
+                signed_txs.push(first);
+            }
+        }
+        Ok(signed_txs)
     }
 
     pub(crate) async fn call_sign_and_send_transaction(

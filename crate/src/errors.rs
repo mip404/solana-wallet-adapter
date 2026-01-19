@@ -168,9 +168,6 @@ pub enum WalletError {
     /// The `solana:signTransaction` function is missing in the provided wallet
     #[error("The `solana:signTransaction` function is missing in the provided wallet")]
     MissingSignTransactionFunction,
-    /// The `solana:signAllTransactions` function is missing in the provided wallet
-    #[error("The `solana:signAllTransactions` function is missing in the provided wallet")]
-    MissingSignAllTransactionsFunction,
     /// The `sendAndSignTransaction` method did not return any signature
     #[error("The `sendAndSignTransaction` method did not return any signature")]
     SendAndSignTransactionSignatureEmpty,

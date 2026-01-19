@@ -60,16 +60,15 @@ impl Wallet {
     }
 
     /// Send a sign transaction request to the browser wallet.
-    /// The transaction bytes expected are encoded using serde in byte form.
     pub async fn sign_transaction(
         &self,
-        transaction_bytes: &[u8],
+        transactions: &[impl AsRef<[u8]>],
         cluster: Option<Cluster>,
         account: &WalletAccount,
     ) -> WalletResult<Vec<Vec<u8>>> {
         self.features
             .sign_tx
-            .call_sign_tx(account, transaction_bytes, cluster)
+            .call_sign_multiple_tx(account, transactions, cluster)
             .await
     }
 
@@ -85,25 +84,6 @@ impl Wallet {
             .sign_and_send_tx
             .call_sign_and_send_transaction(account, transaction_bytes, cluster, options)
             .await
-    }
-
-    /// Sign multiple transactions at once with a single wallet approval.
-    pub async fn sign_all_transactions(
-        &self,
-        transactions: &[impl AsRef<[u8]>],
-        cluster: Option<Cluster>,
-        account: &WalletAccount,
-    ) -> WalletResult<Vec<Vec<u8>>> {
-        if let Some(sign_all_tx) = self.features.sign_all_tx.as_ref() {
-            sign_all_tx
-                .call_sign_all_tx(account, transactions, cluster)
-                .await
-        } else {
-            self.features
-                .sign_tx
-                .call_sign_all_tx(account, transactions, cluster)
-                .await
-        }
     }
 
     /// Get the standard events [Function](web_sys::js_sys::Function) `[standard:events].on`
@@ -256,11 +236,6 @@ impl Wallet {
     /// Check whether the wallet supports `solana:signTransaction` feature
     pub fn solana_sign_transaction(&self) -> bool {
         self.data.solana_sign_transaction()
-    }
-
-    /// Check whether the wallet supports `solana:signAllTransactions` feature
-    pub fn solana_sign_all_transactions(&self) -> bool {
-        self.data.solana_sign_all_transactions()
     }
 
     /// Get the optional wallet icon

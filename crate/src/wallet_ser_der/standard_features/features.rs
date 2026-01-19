@@ -1,10 +1,9 @@
 use wallet_adapter_common::{
     feature_support::FeatureSupport,
     standardized_events::{
-        SOLANA_SIGN_ALL_TRANSACTIONS_IDENTIFIER, SOLANA_SIGN_AND_SEND_TRANSACTION_IDENTIFIER,
-        SOLANA_SIGN_IN_IDENTIFIER, SOLANA_SIGN_MESSAGE_IDENTIFIER,
-        SOLANA_SIGN_TRANSACTION_IDENTIFIER, STANDARD_CONNECT_IDENTIFIER,
-        STANDARD_DISCONNECT_IDENTIFIER, STANDARD_EVENTS_IDENTIFIER,
+        SOLANA_SIGN_AND_SEND_TRANSACTION_IDENTIFIER, SOLANA_SIGN_IN_IDENTIFIER,
+        SOLANA_SIGN_MESSAGE_IDENTIFIER, SOLANA_SIGN_TRANSACTION_IDENTIFIER,
+        STANDARD_CONNECT_IDENTIFIER, STANDARD_DISCONNECT_IDENTIFIER, STANDARD_EVENTS_IDENTIFIER,
     },
 };
 
@@ -29,8 +28,6 @@ pub struct Features {
     pub(crate) sign_and_send_tx: SignTransaction,
     /// solana:signTransaction
     pub(crate) sign_tx: SignTransaction,
-    /// solana:signAllTransactions
-    pub(crate) sign_all_tx: Option<SignTransaction>,
     /// solana:signMessage
     pub(crate) sign_message: SignMessage,
     /// solana:signIn
@@ -79,11 +76,6 @@ impl Features {
                         .sign_in
                         .replace(SignIn::new(&inner_object, version)?);
                     supported_features.sign_in = true;
-                } else if feature == SOLANA_SIGN_ALL_TRANSACTIONS_IDENTIFIER {
-                    features
-                        .sign_all_tx
-                        .replace(SignTransaction::new_sign_all_tx(&inner_object, version)?);
-                    supported_features.sign_all_tx = true;
                 } else {
                     return Err(WalletError::UnsupportedWalletFeature(feature));
                 }
