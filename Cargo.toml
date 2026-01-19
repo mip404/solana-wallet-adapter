@@ -1,5 +1,6 @@
 [workspace]
 members = ["base", "crate", "partial-idl-parser", "wallet-adapter-common"]
+exclude = ["templates"]
 resolver = "2"
 
 [workspace.package]
