@@ -99,7 +99,10 @@ impl Wallet {
                 .call_sign_all_tx(account, transactions, cluster)
                 .await
         } else {
-            Err(WalletError::MissingSignAllTransactionsFunction)
+            self.features
+                .sign_tx
+                .call_sign_all_tx(account, transactions, cluster)
+                .await
         }
     }
 
