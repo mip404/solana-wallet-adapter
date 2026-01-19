@@ -117,10 +117,8 @@ impl SignTransaction {
         let results_array = Reflection::new(success)?.into_array()?;
         let mut signed_txs = Vec::with_capacity(results_array.length() as usize);
         for result in results_array.iter() {
-            let bytes = Reflection::new(result)?.get_bytes_from_vec("signedTransaction")?;
-            if let Some(first) = bytes.into_iter().next() {
-                signed_txs.push(first);
-            }
+            let bytes = Reflection::new(result)?.reflect_bytes("signedTransaction")?;
+            signed_txs.push(bytes);
         }
         Ok(signed_txs)
     }
