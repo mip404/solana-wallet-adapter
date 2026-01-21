@@ -18,7 +18,7 @@ rust-version = "1.84"
 [workspace.dependencies]
 wallet-adapter = { path = "./crate" }
 wallet-adapter-common = { path = "./wallet-adapter-common", version = "1.2.0" }
-blake3 = { version = "1.8.2", default-features = false }
+sha3 = { version = "0.10.8", default-features = false }
 ed25519-dalek = { version = "2.2.0", default-features = false, features = [
     "std",
     "signature",

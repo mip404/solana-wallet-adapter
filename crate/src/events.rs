@@ -10,6 +10,8 @@ use web_sys::{
     CustomEvent, CustomEventInit, Window,
 };
 
+use sha3::{Digest, Sha3_256};
+
 use crate::{
     InnerUtils, Reflection, StorageType, Wallet, WalletAccount, WalletAdapter, WalletError,
     WalletResult,
@@ -95,7 +97,7 @@ impl<'a> InitEvents<'a> {
                         let inner_outcome = storage.clone();
 
                         inner_outcome.borrow_mut().insert(
-                            blake3::hash(wallet.name().to_lowercase().as_bytes()),
+                            Sha3_256::digest(wallet.name().to_lowercase().as_bytes()).into(),
                             wallet,
                         );
                     }

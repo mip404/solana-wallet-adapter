@@ -1,5 +1,7 @@
 use std::time::{Duration, SystemTime};
 
+use sha3::{Digest, Sha3_256};
+
 use crate::{clusters::Cluster, WalletCommonUtils, WalletUtilsError, WalletUtilsResult};
 
 /// The Sign In input used as parameters when performing
@@ -141,7 +143,9 @@ impl SigninInput {
 
         rng.fill_bytes(&mut buffer);
 
-        self.nonce.replace(blake3::hash(&buffer).to_string());
+        let hash = Sha3_256::digest(buffer);
+        self.nonce
+            .replace(hash.iter().map(|b| format!("{:02x}", b)).collect());
         buffer.fill(0);
 
         self

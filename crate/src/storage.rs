@@ -1,9 +1,11 @@
 use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
+use sha3::{Digest, Sha3_256};
+
 use crate::Wallet;
 
-/// Convenience type for `HashMap<blake3::Hash, Wallet>;`
-pub type StorageSchema = HashMap<blake3::Hash, Wallet>;
+/// Convenience type for `HashMap<[u8; 32], Wallet>;`
+pub type StorageSchema = HashMap<[u8; 32], Wallet>;
 
 /// Convenience type for `Rc<RefCell<StorageSchema>>;`
 pub type StorageType = Rc<RefCell<StorageSchema>>;
@@ -13,7 +15,7 @@ pub type StorageType = Rc<RefCell<StorageSchema>>;
 pub struct WalletStorage(StorageType);
 
 impl WalletStorage {
-    /// Clone the inner field  as `Rc<RefCell<HashMap<blake3::Hash, Wallet>>>`
+    /// Clone the inner field  as `Rc<RefCell<HashMap<[u8; 32], Wallet>>>`
     pub fn clone_inner(&self) -> StorageType {
         Rc::clone(&self.0)
     }
@@ -26,9 +28,8 @@ impl WalletStorage {
     /// Get a certain wallet by name from storage
     pub fn get_wallet(&self, wallet_name: &str) -> Option<Wallet> {
         let storage_ref = self.0.borrow();
-        storage_ref
-            .get(&blake3::hash(wallet_name.to_lowercase().as_bytes()))
-            .cloned()
+        let hash: [u8; 32] = Sha3_256::digest(wallet_name.to_lowercase().as_bytes()).into();
+        storage_ref.get(&hash).cloned()
     }
 }
 

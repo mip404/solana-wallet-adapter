@@ -4,6 +4,8 @@ use std::{
     time::{Duration, SystemTime},
 };
 
+use sha3::{Digest, Sha3_256};
+
 use crate::{BaseUtils, Cluster, RandomBytes, WalletAccount, WalletBaseError, WalletBaseResult};
 
 /// The Sign In input used as parameters when performing
@@ -145,8 +147,10 @@ impl<'wa> SignInInput<'_> {
     pub fn set_nonce(&mut self) -> &mut Self {
         let random_bytes = RandomBytes::<32>::generate();
 
-        self.nonce
-            .replace(Cow::Owned(blake3::hash(random_bytes.expose()).to_string()));
+        let hash = Sha3_256::digest(random_bytes.expose());
+        self.nonce.replace(Cow::Owned(
+            hash.iter().map(|b| format!("{:02x}", b)).collect(),
+        ));
 
         self
     }

@@ -19,4 +19,4 @@ humantime.workspace = true
 rand_chacha.workspace = true
 rand_core.workspace = true
 thiserror.workspace = true
-blake3.workspace = true
+sha3.workspace = true
