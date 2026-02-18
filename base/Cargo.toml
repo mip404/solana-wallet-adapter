@@ -1,6 +1,6 @@
 [package]
 name = "wallet-standard-base"
-version = "0.1.7"
+version = "0.1.8"
 authors.workspace = true
 description = "The base features required by wallet-standard"
 homepage.workspace = true
@@ -20,26 +20,18 @@ random_bytes = ["dep:zeroize", "dep:rand_core", "dep:rand_chacha"]
 signIn = ["required", "random_bytes", "dep:humantime", "dep:blake3"]
 
 [dependencies]
-bs58 = { version = "0.5.1" }
-base64ct = { version = "1.8.0", features = ["alloc"] }
-thiserror = { version = "2.0.16", default-features = false }
-rand_chacha = { version = "0.9.0", optional = true, features = [
-    "os_rng",
-], default-features = false }
-rand_core = { version = "0.9.3", optional = true }
-blake3 = { version = "1.8.2", default-features = false, optional = true }
-humantime = { version = "2.2.0", default-features = false, optional = true }
+bs58 = { workspace = true }
+base64ct = { workspace = true, features = ["alloc"] }
+thiserror = { workspace = true, default-features = false }
+rand_chacha = { workspace = true, optional = true, default-features = false }
+rand_core = { workspace = true, optional = true }
+blake3 = { workspace = true, default-features = false, optional = true }
+humantime = { workspace = true, default-features = false, optional = true }
 
 [target.'cfg(not(target_arch = "aarch64"))'.dependencies]
-zeroize = { version = "1.8.1", default-features = false, optional = true }
+zeroize = { workspace = true, default-features = false, optional = true }
 
 [target.'cfg(target_arch = "aarch64")'.dependencies]
-zeroize = { version = "1.8.1", default-features = false, optional = true, features = [
+zeroize = { workspace = true, default-features = false, optional = true, features = [
     "aarch64",
 ] }
-
-[target.'cfg(target_arch = "wasm32")'.dependencies]
-getrandom = { version = "0.3.3", optional = true }
-
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-getrandom = { version = "0.3.3", features = ["wasm_js"], optional = true }
