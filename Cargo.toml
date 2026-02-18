@@ -1,9 +1,15 @@
 [workspace]
-members = ["base", "crate", "partial-idl-parser", "wallet-adapter-common"]
+members = [
+    "base",
+    "crate",
+    "partial-idl-parser",
+    "wallet-adapter-common",
+    "templates/dx-test",
+]
 resolver = "2"
 
 [workspace.package]
-version = "1.3.0"
+version = "1.3.1"
 authors = ["448-OG <superuser@448.africa>"]
 description = "Solana Wallet Adapter for Rust clients written in pure Rust"
 homepage = "https://github.com/JamiiDao"
