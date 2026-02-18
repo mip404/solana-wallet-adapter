@@ -88,15 +88,17 @@ pub fn SendSol(show_send_modal: Signal<bool>) -> Element {
                                             *lamports.read(),
                                             public_key_bytes
                                         ).await {
-                                            GLOBAL_MESSAGE.write().push_back(
-                                                NotificationInfo::error(format!("SEND SOL ERROR: {:?}", error))
-                                            );
+                                            let notification = NotificationInfo::error(format!("SEND SOL ERROR: {:?}", error));
+                                            GLOBAL_MESSAGE.write().entry(
+                                                *notification.key()
+                                            ).or_insert(notification);
                                         }
 
                                         loading.set(false);
                                         show_send_modal.set(false);
 
-                                        GLOBAL_MESSAGE.write().push_back(NotificationInfo::new("Sent"));
+                                        let notification = NotificationInfo::new("Sent");
+                                        GLOBAL_MESSAGE.write().entry(*notification.key()).or_insert(notification);
 
                                         show_send_modal.set(false);
                                     });

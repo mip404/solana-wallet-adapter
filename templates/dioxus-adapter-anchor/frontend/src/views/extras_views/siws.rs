@@ -82,14 +82,16 @@ pub fn SignInWithSolana() -> Element {
                                         spawn(async move {
                                             if let Err(error) = WALLET_ADAPTER.read().sign_in(&signin_input, public_key)
                                             .await{
-                                                GLOBAL_MESSAGE.write().push_back(
-                                                        NotificationInfo::error(
+                                                let notification = NotificationInfo::error(
                                                             format!("SIWS ERROR: {error:?}")
-                                                        )
+                                                        );
+                                                GLOBAL_MESSAGE.write().entry(*notification.key()).or_insert(
+                                                        notification
                                                     );
                                             }else {
-                                                GLOBAL_MESSAGE.write().push_back(
-                                                        NotificationInfo::new("SIWS Successful")
+                                                let notification = NotificationInfo::new("SIWS Successful");
+                                                GLOBAL_MESSAGE.write().entry(*notification.key()).or_insert(
+                                                        notification
                                                     );
                                             }
                                         });

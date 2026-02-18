@@ -27,15 +27,14 @@ pub fn SignMessage() -> Element {
                         onclick: move |_| {
                             spawn(async move {
                                 if let Err(error) = WALLET_ADAPTER.read().sign_message(message.as_bytes()).await{
-                                    GLOBAL_MESSAGE.write().push_back(
-                                        NotificationInfo::error(
+                                   let notification = NotificationInfo::error(
                                             format!("SIGN MESSAGE ERROR: {error:?}")
-                                        )
-                                    );
+                                        );
+
+                                    GLOBAL_MESSAGE.write().entry(*notification.key()).or_insert(notification);
                                 }else {
-                                    GLOBAL_MESSAGE.write().push_back(
-                                        NotificationInfo::new("Sign Message Successful")
-                                    );
+                                    let notification = NotificationInfo::new("Sign Message Successful");
+                                    GLOBAL_MESSAGE.write().entry(*notification.key()).or_insert(notification);
                                 }
                             });
                         },

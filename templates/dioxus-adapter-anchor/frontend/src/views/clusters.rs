@@ -95,10 +95,12 @@ fn Switch(cluster_name: &str) -> Element {
 
                 if let Some(active_cluster) = find_cluster{
                     CLUSTER_STORAGE.write().set_active_cluster(active_cluster);
-                    GLOBAL_MESSAGE.write().push_back(NotificationInfo::new(String::new() + &cluster_name + " cluster now active!"));
+                    let notification = NotificationInfo::new(String::new() + &cluster_name + " cluster now active!");
+                    GLOBAL_MESSAGE.write().entry(*notification.key()).or_insert(notification);
 
                 }else {
-                    GLOBAL_MESSAGE.write().push_back(NotificationInfo::new(String::from("Could not find `") + &cluster_name + "` cluster!"));
+                    let notification = NotificationInfo::new(String::from("Could not find `") + &cluster_name + "` cluster!");
+                    GLOBAL_MESSAGE.write().entry(*notification.key()).or_insert(notification);
                 }
 
             },
@@ -115,9 +117,11 @@ fn Delete(cluster: AdapterCluster) -> Element {
         div{
             onclick:move|_|{
                 if CLUSTER_STORAGE.write().remove_cluster(cluster.name()).is_some(){
-                   GLOBAL_MESSAGE.write().push_back(NotificationInfo::new(String::new() + cluster.name() + " cluster has been removed!"));
+                   let notification = NotificationInfo::new(String::new() + cluster.name() + " cluster has been removed!");
+                   GLOBAL_MESSAGE.write().entry(*notification.key()).or_insert(notification);
                 }else {
-                    GLOBAL_MESSAGE.write().push_back(NotificationInfo::new(String::from("Could not find `") + cluster.name() + "` cluster!"));
+                    let notification = NotificationInfo::new(String::from("Could not find `") + cluster.name() + "` cluster!");
+                    GLOBAL_MESSAGE.write().entry(*notification.key()).or_insert(notification);
                 }
 
             },
@@ -242,10 +246,12 @@ fn AddClusterModal(mut show_add_cluster_modal: Signal<bool>) -> Element {
                                         if let Err(error) = CLUSTER_STORAGE.write().add_cluster(adapter_cluster){
                                             show_add_cluster_modal.set(false);
 
-                                            GLOBAL_MESSAGE.write().push_back(NotificationInfo::new(format!("Error Adding Cluster: `{error}`!")));
+                                            let notification = NotificationInfo::new(format!("Error Adding Cluster: `{error}`!"));
+                                            GLOBAL_MESSAGE.write().entry(*notification.key()).or_insert(notification);
 
                                         }else {
-                                            GLOBAL_MESSAGE.write().push_back(NotificationInfo::new(format!("Added `{name}` cluster!")));
+                                            let notification = NotificationInfo::new(format!("Added `{name}` cluster!"));
+                                            GLOBAL_MESSAGE.write().entry(*notification.key()).or_insert(notification);
                                             show_add_cluster_modal.set(false);
                                         }
 

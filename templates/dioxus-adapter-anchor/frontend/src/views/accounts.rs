@@ -380,16 +380,20 @@ pub async fn fetch_account_state(
         Ok(value) => {
             *ACCOUNT_STATE.write() = value;
             if let Some(success_msg) = success_msg {
+                let notification = NotificationInfo::new(success_msg);
                 GLOBAL_MESSAGE
                     .write()
-                    .push_back(NotificationInfo::new(success_msg));
+                    .entry(*notification.key())
+                    .or_insert(notification);
             }
         }
         Err(error) => {
             if let Some(error_msg) = error_msg {
+                let notification = NotificationInfo::error(format!("{error_msg}: {:?}", error));
                 GLOBAL_MESSAGE
                     .write()
-                    .push_back(NotificationInfo::error(format!("{error_msg}: {:?}", error)));
+                    .entry(*notification.key())
+                    .or_insert(notification);
             }
         }
     }

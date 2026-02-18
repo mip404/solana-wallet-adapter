@@ -1,9 +1,8 @@
 use dioxus::prelude::*;
-use solana_sdk::native_token::LAMPORTS_PER_SOL;
 
 use crate::{
     fetch_parser::request_airdrop, AirdropSvg, Loader, NotificationInfo, ACTIVE_CONNECTION,
-    GLOBAL_MESSAGE,
+    GLOBAL_MESSAGE, LAMPORTS_PER_SOL,
 };
 
 #[component]
@@ -70,12 +69,14 @@ pub fn Airdrop(show_airdrop_modal: Signal<bool>) -> Element {
                                         loading.set(true);
 
                                         if request_airdrop(*lamports.read(), &address).await.is_err() {
-                                            GLOBAL_MESSAGE.write().push_back(
-                                                NotificationInfo::error("REQUEST AIRDROP ERROR: You might have reached your daily limit.")
+                                            let notification =  NotificationInfo::error("REQUEST AIRDROP ERROR: You might have reached your daily limit.");
+                                            GLOBAL_MESSAGE.write().entry(*notification.key()).or_insert(
+                                               notification
                                             );
                                         }else {
-                                            GLOBAL_MESSAGE.write().push_back(
-                                                NotificationInfo::new("REQUESTED AIRDROP")
+                                            let notification = NotificationInfo::new("REQUESTED AIRDROP");
+                                            GLOBAL_MESSAGE.write().entry(*notification.key()).or_insert(
+                                                notification
                                             );
                                         }
 

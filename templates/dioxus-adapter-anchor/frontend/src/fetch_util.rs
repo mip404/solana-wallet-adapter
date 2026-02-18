@@ -1,5 +1,6 @@
 use dioxus::prelude::*;
 use wallet_adapter::{
+    blake3,
     wasm_bindgen_futures::JsFuture,
     web_sys::{wasm_bindgen::JsCast, Headers, Request, RequestInit, Response},
     WalletError, WalletResult,
@@ -9,7 +10,7 @@ use crate::{
     views::ClusterNetState, CLUSTER_NET_STATE, CLUSTER_STORAGE, GLOBAL_MESSAGE, WALLET_ADAPTER,
 };
 
-// NOTE: You can use Reqwest crate but
+// NOTE: You can use Reqwest crate instead to fetch the blockhash but
 // this code shows how to use the browser `fetch` api
 #[derive(Debug)]
 pub struct FetchReq {
@@ -51,9 +52,12 @@ impl FetchReq {
                 }
             }
             Err(error) => {
+                let notification = NotificationInfo::error(error);
+
                 GLOBAL_MESSAGE
                     .write()
-                    .push_back(NotificationInfo::error(error));
+                    .entry(*notification.key())
+                    .or_insert(notification);
             }
         }
     }
@@ -109,19 +113,21 @@ impl FetchReq {
 
 #[derive(Debug, Clone)]
 pub struct NotificationInfo {
-    key: u32,
+    key: blake3::Hash,
     secs: u32,
     message: String,
 }
 
 impl NotificationInfo {
     pub fn new(message: impl core::fmt::Display) -> Self {
-        let key = fastrand::u32(..);
+        let message = message.to_string();
+
+        let key = blake3::hash(message.as_bytes());
 
         Self {
             key,
             secs: 2,
-            message: message.to_string(),
+            message,
         }
     }
 
@@ -136,8 +142,8 @@ impl NotificationInfo {
         self
     }
 
-    pub fn key(&self) -> u32 {
-        self.key
+    pub fn key(&self) -> &blake3::Hash {
+        &self.key
     }
 
     pub fn secs(&self) -> u32 {

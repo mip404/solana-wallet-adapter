@@ -59,9 +59,11 @@ pub fn ReceiveSol(show_receive_modal: Signal<bool>) -> Element {
 
                                 spawn(async move {
                                     if let Err(error) = copied_address(&address_inner).await {
-                                        GLOBAL_MESSAGE.write().push_back(NotificationInfo::error(format!("COPY ERROR: {:?}", error)));
+                                        let notification = NotificationInfo::error(format!("COPY ERROR: {:?}", error));
+                                        GLOBAL_MESSAGE.write().entry(*notification.key()).or_insert(notification);
                                     } else {
-                                        GLOBAL_MESSAGE.write().push_back(NotificationInfo::new("Copied to clipboard"));
+                                        let notification = NotificationInfo::new("Copied to clipboard");
+                                        GLOBAL_MESSAGE.write().entry(*notification.key()).or_insert(notification);
                                     }
                                 });
                             },

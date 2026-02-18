@@ -2,9 +2,9 @@ use dioxus::prelude::*;
 
 use crate::{
     trunk_cluster_name, utils::copied_address, views::ClusterNetState, ChangeWalletSvg, CloseSvg,
-    ClustersSvg, CopySvg, DisconnectSvg, FetchReq, GradientWalletIcon, Loader, NotificationInfo,
-    Route, WalletSvg, ACTIVE_CONNECTION, CLUSTER_NET_STATE, CLUSTER_STORAGE, GLOBAL_MESSAGE, LOGO,
-    WALLET_ADAPTER,MenuSvg,
+    ClustersSvg, CopySvg, DisconnectSvg, FetchReq, GradientWalletIcon, Loader, MenuSvg,
+    NotificationInfo, Route, WalletSvg, ACTIVE_CONNECTION, CLUSTER_NET_STATE, CLUSTER_STORAGE,
+    GLOBAL_MESSAGE, LOGO, WALLET_ADAPTER,
 };
 
 #[component]
@@ -44,7 +44,7 @@ pub fn Header() -> Element {
                         div{class:"flex appearance-none text-center cursor-pointer",
                             span{
                                 onclick:move |_|{show_mobile_close_button.set(true)},
-                                class:"flex w-[15px]", {MenuSvg()} 
+                                class:"flex w-[15px]", {MenuSvg()}
                             }
                         }
                     }
@@ -54,10 +54,10 @@ pub fn Header() -> Element {
                             div{class:"flex w-[80%] flex-col md:lg:flex-row items-end justify-end",
                                 span{
                                     onclick:move |_|{show_mobile_close_button.set(false)},
-                                    class:"flex w-[30px]", {CloseSvg()} 
+                                    class:"flex w-[30px]", {CloseSvg()}
                                 }
                             }
-                            
+
                             div {class:"flex flex-col md:lg:flex-row items-center justify-center w-full",
                                 div{ class:"flex flex-col md:lg:flex-row  items-center justify-center w-full md:w-[80%] mx-2",
                                     {NavItem(Route::Dashboard, "Home")}
@@ -83,7 +83,7 @@ pub fn Header() -> Element {
 }
 
 #[component]
-pub fn ConnectWalletModalModal(show_modal: Signal<bool>, show_connecting: Signal<bool>,) -> Element {
+pub fn ConnectWalletModalModal(show_modal: Signal<bool>, show_connecting: Signal<bool>) -> Element {
     if *show_modal.read() {
         rsx! {
             div{class:"flex flex-col w-full h-full bg-[#1a1a1a88] absolute items-center justify-center z-50",
@@ -120,7 +120,9 @@ pub fn ConnectWalletModalModal(show_modal: Signal<bool>, show_connecting: Signal
                                                 show_connecting.set(true);
 
                                                 if let Err(error) = WALLET_ADAPTER.write().connect(wallet).await {
-                                                    GLOBAL_MESSAGE.write().push_back(NotificationInfo::new(error));
+                                                    let notification = NotificationInfo::new(error);
+
+                                                    GLOBAL_MESSAGE.write().entry(*notification.key()).or_insert(notification);
                                                 }
 
                                                 show_connecting.set(false);
@@ -189,12 +191,14 @@ fn NavClusterItem() -> Element {
                     let cluster_identifier = String::new() + cluster.name() + " cluster now active!";
                     CLUSTER_STORAGE.write().set_active_cluster(cluster);
 
-                    GLOBAL_MESSAGE.write().push_back(NotificationInfo::new(cluster_identifier));
+                    let notification = NotificationInfo::new(cluster_identifier);
+
+                    GLOBAL_MESSAGE.write().entry(*notification.key()).or_insert(notification);
                 },
                 class:"flex text-sm hover:bg-true-yonder bg-true-blue text-white rounded-full md:py-1 md:px-4 appearance-none text-center cursor-pointer",
                 for adapter_cluster in CLUSTER_STORAGE.read().get_clusters() {
                     option {
-                        key:adapter_cluster.identifier.as_str(),
+                        key:"{adapter_cluster.identifier().as_str().to_owned()}",
                         value:adapter_cluster.name(), selected:adapter_cluster.name().as_bytes() == CLUSTER_STORAGE.read().active_cluster().name().as_bytes(),
                         {trunk_cluster_name(adapter_cluster.name())},}
                 }
@@ -208,7 +212,7 @@ fn NavWalletItem(
     show_modal: Signal<bool>,
     show_connecting: Signal<bool>,
     shortened_address: String,
-    show_mobile_close_button: Signal<bool>
+    show_mobile_close_button: Signal<bool>,
 ) -> Element {
     let compute_wallet = || {
         if let Ok(connected_account) = ACTIVE_CONNECTION.read().connected_account() {
@@ -248,13 +252,18 @@ fn NavWalletItem(
 }
 
 #[component]
-pub fn ActiveAccountDropDown(show_modal: Signal<bool>, address: String, shortened_address: String, show_mobile_close_button: Signal<bool>) -> Element {
+pub fn ActiveAccountDropDown(
+    show_modal: Signal<bool>,
+    address: String,
+    shortened_address: String,
+    show_mobile_close_button: Signal<bool>,
+) -> Element {
     let mut show_dropdown = use_signal(|| false);
 
     let disconnect_callback = move || {
         spawn(async move {
             WALLET_ADAPTER.write().disconnect().await;
-            
+
             show_mobile_close_button.set(false);
         });
     };
@@ -265,13 +274,14 @@ pub fn ActiveAccountDropDown(show_modal: Signal<bool>, address: String, shortene
         let inner_address = clone_address.clone();
         spawn(async move {
             if let Err(error) = copied_address(&inner_address).await {
-                GLOBAL_MESSAGE
-                    .write()
-                    .push_back(NotificationInfo::new(error));
+                let notification = NotificationInfo::new(error);
+                GLOBAL_MESSAGE.write().entry(*notification.key());
             } else {
+                let notification = NotificationInfo::new("Copied to clipboard");
                 GLOBAL_MESSAGE
                     .write()
-                    .push_back(NotificationInfo::new("Copied to clipboard"));
+                    .entry(*notification.key())
+                    .or_insert(notification);
             }
             show_mobile_close_button.set(false);
         });
@@ -280,7 +290,6 @@ pub fn ActiveAccountDropDown(show_modal: Signal<bool>, address: String, shortene
     let change_wallet_callback = move || {
         show_modal.set(true);
         show_mobile_close_button.set(false);
-
     };
 
     let connected_wallet = ACTIVE_CONNECTION.read().connected_wallet().unwrap().clone();

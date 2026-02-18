@@ -1,7 +1,6 @@
 #![allow(non_snake_case)]
 
 use dioxus::prelude::*;
-use partial_idl_parser::get_idl;
 
 mod views;
 use views::*;
@@ -26,8 +25,6 @@ pub(crate) use fetch_util::*;
 
 mod app;
 pub(crate) use app::*;
-
-pub(crate) const IDL_RAW_DATA: &str = get_idl!();
 
 fn main() {
     launch(App);

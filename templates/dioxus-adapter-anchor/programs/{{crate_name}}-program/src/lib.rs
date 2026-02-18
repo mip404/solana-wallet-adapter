@@ -1,9 +1,9 @@
 use anchor_lang::prelude::*;
 
-declare_id!("3rFzgYuL3EBragfJhc9ELMUQPeLvP4qApJyWpTBMuZ7g");
+declare_id!("34SLPmeTBTYxRueSdYPaCRxfSGbTW9HKK4fCnXarw4aR");
 
 #[program]
-pub mod temp {
+pub mod dx_test_anchor {
     use super::*;
 
     pub fn initialize(ctx: Context<Initialize>) -> Result<()> {

@@ -4,6 +4,8 @@ use wallet_adapter::{wasm_bindgen_futures::JsFuture, Cluster, WalletResult};
 
 use crate::{DevnetSvg, LocalnetSvg, MainnetSvg, TestnetSvg, CLUSTER_STORAGE, WINDOW};
 
+pub const LAMPORTS_PER_SOL: u64 = 1_000_000_000;
+
 pub fn trunk_cluster_name(name: &str) -> String {
     if name.len() > 10 {
         name.chars().take(10).collect::<String>() + "..."
