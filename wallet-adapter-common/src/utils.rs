@@ -21,12 +21,10 @@ impl WalletCommonUtils {
 
     /// Generate a 32 byte array from random bytes
     pub fn rand_32bytes() -> [u8; 32] {
-        use getrandom::SysRng;
-
         use rand_chacha::ChaCha12Rng;
-        use rand_core::{Rng, SeedableRng};
+        use rand_core::{RngCore, SeedableRng};
 
-        let mut rng = ChaCha12Rng::try_from_rng(&mut SysRng).unwrap();
+        let mut rng = ChaCha12Rng::from_os_rng();
         let mut buffer = [0u8; 32];
 
         rng.fill_bytes(&mut buffer);

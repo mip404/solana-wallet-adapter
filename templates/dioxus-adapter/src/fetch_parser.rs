@@ -2,17 +2,17 @@ use std::str::FromStr;
 
 use dioxus::prelude::*;
 use serde::Deserialize;
-use solana_sdk::{
-    native_token::LAMPORTS_PER_SOL, pubkey::Pubkey, system_instruction::transfer,
-    transaction::Transaction,
-};
+use solana_pubkey::Pubkey;
+use solana_transaction::Transaction;
 use solana_transaction_error::TransactionError;
 use wallet_adapter::{
     web_sys::{js_sys::Date, wasm_bindgen::JsValue},
     SendOptions, WalletError, WalletResult,
 };
 
-use crate::{views::AccountState, FetchReq, ACCOUNT_STATE, CLUSTER_STORAGE, WALLET_ADAPTER};
+use crate::{
+    views::AccountState, FetchReq, ACCOUNT_STATE, CLUSTER_STORAGE, LAMPORTS_PER_SOL, WALLET_ADAPTER,
+};
 
 pub fn format_timestamp(unix_timestamp: i64) -> String {
     let timestamp_ms = unix_timestamp as f64 * 1000.0; //Convert seconds to millisconds
@@ -25,7 +25,7 @@ pub fn format_timestamp(unix_timestamp: i64) -> String {
         .unwrap_or("Invalid Timestamp".to_string())
 }
 
-async fn get_blockhash() -> WalletResult<solana_sdk::hash::Hash> {
+async fn get_blockhash() -> WalletResult<solana_hash::Hash> {
     let options = jzon::object! {
         "id":1,
         "jsonrpc":"2.0",
@@ -51,7 +51,7 @@ async fn get_blockhash() -> WalletResult<solana_sdk::hash::Hash> {
     )
     .unwrap();
 
-    solana_sdk::hash::Hash::from_str(deser.result.value.blockhash)
+    solana_hash::Hash::from_str(deser.result.value.blockhash)
         .map_err(|error| WalletError::Op(error.to_string()))
 }
 
@@ -99,7 +99,8 @@ pub async fn send_sol_req(
         "Invalid Recipient Address".to_string(),
     )))?;
 
-    let send_sol_instruction = transfer(&pubkey, &recipient, lamports);
+    let send_sol_instruction =
+        solana_system_interface::instruction::transfer(&pubkey, &recipient, lamports);
     let mut tx = Transaction::new_with_payer(&[send_sol_instruction], Some(&pubkey));
     let blockhash = get_blockhash().await?;
 

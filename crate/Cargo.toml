@@ -24,7 +24,7 @@ rand_chacha.workspace = true
 bs58.workspace = true
 blake3.workspace = true
 async-lock.workspace = true
-wallet-adapter-common.workspace = true
+wallet-adapter-common = { path = "../wallet-adapter-common" }
 ed25519-dalek.workspace = true
 
 [dev-dependencies]

@@ -1,9 +1,8 @@
 use dioxus::prelude::*;
-use solana_sdk::native_token::LAMPORTS_PER_SOL;
 
 use crate::{
     fetch_parser::request_airdrop, AirdropSvg, Loader, NotificationInfo, ACTIVE_CONNECTION,
-    GLOBAL_MESSAGE,
+    GLOBAL_MESSAGE, LAMPORTS_PER_SOL,
 };
 
 #[component]
