@@ -1,6 +1,6 @@
 [package]
 name = "wallet-standard-base"
-version = "0.1.8"
+version = "0.2.0"
 authors.workspace = true
 description = "The base features required by wallet-standard"
 homepage.workspace = true
@@ -27,6 +27,7 @@ rand_chacha = { workspace = true, optional = true, default-features = false }
 rand_core = { workspace = true, optional = true }
 blake3 = { workspace = true, default-features = false, optional = true }
 humantime = { workspace = true, default-features = false, optional = true }
+getrandom = { workspace = true, features = ["wasm_js", "sys_rng"] }
 
 [target.'cfg(not(target_arch = "aarch64"))'.dependencies]
 zeroize = { workspace = true, default-features = false, optional = true }
