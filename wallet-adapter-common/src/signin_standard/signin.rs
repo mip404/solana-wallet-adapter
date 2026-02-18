@@ -133,9 +133,9 @@ impl SigninInput {
     /// and the bytes converted to hex formatted string.
     pub fn set_nonce(&mut self) -> &mut Self {
         use rand_chacha::ChaCha12Rng;
-        use rand_core::{RngCore, SeedableRng};
+        use rand_core::{Rng, SeedableRng};
 
-        let mut rng = ChaCha12Rng::from_os_rng();
+        let mut rng = ChaCha12Rng::from_seed(Default::default());
 
         let mut buffer = [0u8; 32];
 

@@ -38,7 +38,6 @@ pub use async_channel;
 pub use blake3;
 pub use bs58;
 pub use ed25519_dalek;
-pub use getrandom;
 pub use humantime;
 pub use rand_chacha;
 pub use rand_core;
