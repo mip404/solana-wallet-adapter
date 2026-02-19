@@ -3,8 +3,9 @@
 ### Supported templates
 
 - [x] Dioxus
-- [x] Yew
-- [x] Sycamore
+- [ ] Leptos (under development)
+- [x] Yew (legacy deprecated)
+- [x] Sycamore (legacy deprecated)
 
 ### Maintenance 
 
@@ -62,33 +63,8 @@ New releases will be for bug fixes or to support a new release based on a new ve
 17. Unsupported extra features for example wallets that don't support SIWS
     <img src="https://raw.githubusercontent.com/JamiiDao/SolanaWalletAdapter/refs/heads/master/templates/template-screenshots/siws-unsupported.png" alt="Connect Wallet First" width="50%">
 
-### Choosing a template
+ 
 
-- Dioxus is the recommended template. Dioxus web framework `(>=0.6.0)` enables the best developer experience of the templates due to easy state management (like global hooks) and robust tools (like hot-reloading and bundling) implemented by the Dioxus team. The only issue with Dioxus in this implementation is that it only supports tailwind `<=0.3`. Support for tailwind `v4` will be released with upcoming dioxus `0.7`. The dioxus template will be updated to support tailwind v4 when dioxus 0.7 is released.
-
-- Sycamore also has good state management but lacks hot reloading.
-
-- ***Yew is not recommended,*** it has a lot of issues that haven't been address for a while. Issues like:
-
-  - Fills temporary directory of the operating system quickly causing Trunk build tool to panic with error `no space left on the device`
-
-  - Stale state management, for example the `accounts` route doesn't refresh unless the `Refresh` button is tapped on. On other routes, state management must be triggered manually by passing around a boolean value that is then set to true to cause the page to reload. Using `use_effect` hooks on a component routinely causes infinite renders. See issue [#3796](https://github.com/yewstack/yew/issues/3796)
-
-  - Some events don't fire on input unless workaround events like `onchange` instead of `oninput` are used. See a similar issue [#3792](https://github.com/yewstack/yew/issues/3792)
-
-  - Difficult to use `Option<T>` type for optional types. See issue [#3747](https://github.com/yewstack/yew/issues/3747)
-
-  - Firefox doesn't update the clusters in the `select` element in the template header if the element changes from within another component in the page. See issue [#3745]
-
-    ***Until these issues are fixed, using Yew is not recommended.***
-  
-  Note that for anchor templates, the `partial-idl-parser` crate is used to read the IDL from the `CARGO_WORKSPACE_DIR/target/temp.json` file using a `.cargo/config.toml` in the root
-  ```toml
-  [env]
-  CARGO_WORKSPACE_DIR = { value = "", relative = true }
-  ```
-  
-  This creates a variable cargo environment variable `CARGO_WORKSPACE_DIR` that makes it easy to locate this JSON IDL file. Remember first to run `anchor build` so that anchor can generate the IDL file.
 
 ### To generate the starter code for various templates, first install `cargo generate`
 
@@ -107,13 +83,13 @@ cargo binstall cargo-generate
 cargo generate --name <project name> https://github.com/JamiiDao/SolanaWalletAdapter/ templates/dioxus-adapter
 ```
 
-- Yew template
+- Yew template (deprecated)
 
 ```sh
 cargo generate --name <project name> https://github.com/JamiiDao/SolanaWalletAdapter/ templates/yew-adapter
 ```
 
-- Sycamore Template
+- Sycamore Template (deprecated)
 
 ```sh
 cargo generate --name <project name> https://github.com/JamiiDao/SolanaWalletAdapter/ templates/sycamore-adapter
@@ -126,12 +102,12 @@ cargo generate --name <project name> https://github.com/JamiiDao/SolanaWalletAda
   cargo generate --name <project name> https://github.com/JamiiDao/SolanaWalletAdapter/ templates/dioxus-adapter-anchor
   ```
 
-- Sycamore frontend with Anchor IDL
+- Sycamore frontend with Anchor IDL (deprecated)
   ```sh
   cargo generate --name <project name> https://github.com/JamiiDao/SolanaWalletAdapter/ templates/sycamore-adapter-anchor
   ```
 
-- Yew frontend with Anchor IDL
+- Yew frontend with Anchor IDL (deprecated)
   ```sh
   cargo generate --name <project name> https://github.com/JamiiDao/SolanaWalletAdapter/ templates/yew-adapter-anchor
   ```
@@ -139,3 +115,11 @@ cargo generate --name <project name> https://github.com/JamiiDao/SolanaWalletAda
 ### Running the templates
 
 After generating the template, follow the instructions in the template's `README.md` file in the template root.
+
+Note that for anchor templates, the IDL from the `CARGO_WORKSPACE_DIR/target/{{crate_name}}.json` file using a `.cargo/config.toml` in the root
+```toml
+[env]
+CARGO_WORKSPACE_DIR = { value = "", relative = true }
+```
+
+This creates a variable cargo environment variable `CARGO_WORKSPACE_DIR` that makes it easy to locate this JSON IDL file. Remember first to run `anchor build` so that anchor can generate the IDL file.
