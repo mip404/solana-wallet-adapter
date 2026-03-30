@@ -254,8 +254,10 @@ Here, we simulate signing a SOL transfer instruction
 ```rust
 use wallet_adapter::{WalletAdapter, WalletResult, Cluster, Utils,};
 use solana_sdk::{
-    native_token::LAMPORTS_PER_SOL, pubkey::Pubkey, system_instruction, transaction::Transaction,
+    native_token::LAMPORTS_PER_SOL, pubkey::Pubkey, transaction::Transaction,
 };
+use solana_system_interface::instruction::transfer;
+
 
 async fn foo() -> WalletResult<()> {
     let mut adapter = WalletAdapter::init()?;
@@ -285,7 +287,7 @@ async fn foo() -> WalletResult<()> {
     let sol = LAMPORTS_PER_SOL;
 
     // Create an instruction to transfer the SOL
-    let instr = system_instruction::transfer(&pubkey, &recipient_pubkey, sol);
+    let instr = transfer(&pubkey, &recipient_pubkey, sol);
     // Create a new unsigned transaction
     let tx = Transaction::new_with_payer(&[instr], Some(&pubkey));
     // Serialize the transaction into bytes using `bincode`
@@ -325,10 +327,11 @@ use std::str::FromStr;
 use wallet_adapter::{WalletAdapter, WalletResult, Cluster, Utils, SendOptions};
 use serde::Deserialize;
 use solana_sdk::{
-    native_token::LAMPORTS_PER_SOL, pubkey::Pubkey, system_instruction, transaction::Transaction,
+    native_token::LAMPORTS_PER_SOL, pubkey::Pubkey, transaction::Transaction,
 };
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{wasm_bindgen::JsCast, Headers, Request, RequestInit, Response};
+use solana_system_interface::instruction::transfer;
 
 async fn foo() -> WalletResult<()> {
     let mut adapter = WalletAdapter::init()?;
@@ -340,7 +343,7 @@ async fn foo() -> WalletResult<()> {
     let pubkey = Pubkey::new_from_array(public_key);
     let recipient_pubkey = Pubkey::new_from_array(Utils::public_key_rand());
     let sol = LAMPORTS_PER_SOL;
-    let instr = system_instruction::transfer(&pubkey, &recipient_pubkey, sol);
+    let instr = transfer(&pubkey, &recipient_pubkey, sol);
 
     // This part is different from Sign Transaction above since we need a valid recent blockhash
     // as part of the `SendAndSignTransaction` specification.

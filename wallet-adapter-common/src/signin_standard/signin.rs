@@ -134,19 +134,11 @@ impl SigninInput {
     /// This is generated from the Cryptographically Secure Random Number Generator
     /// and the bytes converted to hex formatted string.
     pub fn set_nonce(&mut self) -> &mut Self {
-        use rand_chacha::ChaCha12Rng;
-        use rand_core::{RngCore, SeedableRng};
+        let random_bytes = WalletCommonUtils::rand_32bytes();
 
-        let mut rng = ChaCha12Rng::from_os_rng();
-
-        let mut buffer = [0u8; 32];
-
-        rng.fill_bytes(&mut buffer);
-
-        let hash = Sha3_256::digest(buffer);
+        let hash = Sha3_256::digest(&random_bytes);
         self.nonce
             .replace(hash.iter().map(|b| format!("{:02x}", b)).collect());
-        buffer.fill(0);
 
         self
     }
